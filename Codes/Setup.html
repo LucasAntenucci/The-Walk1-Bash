@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+    <html>
+        <head>
+            <title>Code Setup</title> 
+            <meta http-equiv="Content-Type"
+            content="text/html;charset=UTF-8">
+                </head>
+
+        </head> 
+        <body style="background-color: black;">
+            <p><pre style="color: white; font-size: 20px;">
+                import pathlib
+                import os
+                import shutil
+                from ctypes import *
+                import subprocess
+                from subprocess import CREATE_NO_WINDOW
+                from turtle import back
+
+                def error_quit():
+                    input("")
+                    quit()
+
+                if not windll.shell32.IsUserAnAdmin():
+                    print("Por Favor, execute como administrador")
+                    error_quit()
+
+                current_dir = os.getcwd()
+                current_drive = pathlib.Path.home().drive
+                current_user = os.path.expanduser("~")
+                startup_folder = current_user + \
+                    "\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup"
+
+                try:
+                    shutil.copy(current_dir + "\\AutoStartcmd.cmd", startup_folder)
+                except Exception as e:
+                    print(
+                        f"Falha ao copiar o arquivo AutoStartcmd.cmd para a pasta {startup_folder}. Erro: {e}")
+
+                try:
+                    shutil.copytree(current_dir, current_drive+"\\Dehkiller")
+                except Exception as e:
+                    try:
+                        win_archives = os.listdir(current_drive + "\\")
+                        if "Dehkiller" in win_archives:
+                            print("Já existe uma pasta do antivírus no diretório raíz. Será excluída para que você instale novamente")
+                            try:
+                                shutil.rmtree(current_drive+"\\Dehkiller")
+                                print("Apagando a pasta antiga\nRode novamente a ferramenta de instalação")
+                                error_quit()
+                            except Exception as e:
+                                print(
+                                    f"Falha ao remover a pasta Dehkiller: {e}. Remova manualmente no diretório Windows")
+                                error_quit()
+                    except Exception as e:
+                        print(f"Falha na instalação: {e}")
+                        error_quit()
+
+                print("Sucesso na instalação!")
+                print(
+                    f"Instalado a pasta da ferramenta  no diretório: {current_drive}\\Dehkiller")
+
+                modo = 1
+                while modo not in ["s", "n"]:
+                    modo = str(input("Deseja iniciar a ferramenta Dehkiller agora ? (s/n) : "))
+                    if modo == "s":
+                        try:
+                            start = subprocess.Popen(
+                                "AutoStartcmd.cmd", creationflags=CREATE_NO_WINDOW)
+                            print("Sucesso!")
+                        except Exception as e:
+                            print(f"Falha: {e}")
+
+                backup = 1
+                while backup not in ["s", "n"]:
+                    backup = str(
+                        input("Deseja realizar um backup agora? (s/n) : "))
+                    if backup == "s": 
+                        try:
+                            caminhob = str(input("Insira o caminho da pasta que deseja realizar o Backup: "))
+                            subprocess.Popen(r'robocopy {} E: /e /copyall'.format(caminhob), subprocess.CREATE_NO_WINDOW)
+                            subprocess.Popen(r'C:\Dehkiller\remove.cmd', subprocess.CREATE_NO_WINDOW)
+                    
+                        except Exception as e:
+                            print(f"Falha: {e}")
+
+
+            </pre></p>
+        </body>
+
+    </html>

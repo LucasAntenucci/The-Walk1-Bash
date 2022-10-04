@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+    <html>
+        <head>
+            <title>Code AutoStart</title> 
+            <meta http-equiv="Content-Type"
+            content="text/html;charset=UTF-8">
+                </head>
+
+        </head> 
+        <body style="background-color: black; border-left: 0px;">
+            <p><pre style="color: white; font-size: 20px; border: 0px;">
+                import subprocess
+                from subprocess import CREATE_NO_WINDOW
+                import pathlib
+                import atexit
+                from ctypes import *
+                
+                try:
+                   caminhob = input("Insira o caminho da pasta que deseja realizar o Backup: ")
+                   subprocess.Popen(r'robocopy {} E: /e /copyall'.format(caminhob), subprocess.CREATE_NO_WINDOW)
+                   subprocess.Popen(r'C:\Dehkiller\remove.cmd', subprocess.CREATE_NO_WINDOW)
+                   print("Sucesso!")
+                except Exception as e:
+                   print(f"Falha: {e}")
+                
+                drive = pathlib.Path.home().drive
+                py_path = "python " + drive + "\\Dehkiller\\Dehkiller.exe -l -r " + drive +  "\\Dehkiller\\Ransom.yar -k"
+                try:
+                   pid = subprocess.Popen(py_path, creationflags=CREATE_NO_WINDOW)
+                   print("[MEMORY-SCANNER] Sucesso ao abrir o Memory-Scanner!")
+                except Exception as e:
+                   erro = f"Erro ao abrir o Memory Scanner: {e}"
+                   windll.user32.MessageBoxA(0, erro.encode(), b"ALERTA!!!", 0)
+                
+                def killDehkiller(dehkiller):
+                    try:
+                       dehkiller.kill()
+                       print("[MEMORY-SCANNER] Finalizando o Memory Scanner...")
+                    except Exception as e:
+                        print("[MEMORY-SCANNER] Falha ao finalizar o Memory Scanner.")
+
+
+            </pre></p>
+        </body>
+    </html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+    <html>
+        <head>
+            <title>Code Dehkiller</title> 
+            <meta http-equiv="Content-Type"
+            content="text/html;charset=UTF-8">
+                </head>
+
+        </head> 
+        <body style="background-color: black;">
+
+            <p><pre style="color: white; font-size: 20px;">
+                import os
+                import re
+                import yara
+                import time
+                import atexit
+                import optparse
+                import pathlib 
+                import subprocess
+                from ctypes import *
+                from ctypes import wintypes
+                
+                drive = pathlib.Path.home().drive
+                
+                
+                def logActivity(log):
+                    with open (drive+"\\Dehkiller\\memorylog", "a") as logging:
+                        logging.write(log + "\n")
+                    print(log)
+                
+                
+                def arguments():
+                    parser = optparse.OptionParser()
+                    parser.add_option("-r", "--rule", dest="rules",
+                                      help="Arquivo .yar com as rules")
+                    parser.add_option("-l", "--live", dest="live", default=False,
+                                      action="store_true", help="Modo Proteção em Tempo Real")
+                    parser.add_option("-s", "--scan", dest="scan", type="int",
+                                      help="Modo Scan de um proceso específico. Inpute o PID aqui")
+                    parser.add_option("-k", "--kill", dest="kill", default=False,
+                                      action="store_true", help="Mata o processo se dar match nas strings")
+                    (inputs, args) = parser.parse_args()
+                
+                    if inputs.live and inputs.scan:
+                        parser.error("[X] Escolha somente 1 modo de funcionamento")
+                
+                    return (inputs.rules, inputs.live, inputs.scan, inputs.kill)
+                
+                
+                def memory_scanner(processid, rules, terminate):
+                
+                    scan = rules.match(pid=processid)
+                    if len(scan) == 0 or processid == os.getpid():
+                        logActivity(f"[MEMORY SCANNER]: Processo {processid} clean")
+                
+                    else:
+                        logActivity(f"[MEMORY SCANNER]: Processo {processid} é malicioso")
+                        logActivity(f"[MEMORY SCANNER]: Strings encontadas: {scan}")
+                        subprocess.Popen(r'C:\Dehkiller\remove.cmd', subprocess.CREATE_NO_WINDOW)
+                        os.system('cls' if os.name == 'nt' else 'clear')
+                        if terminate:
+                            try:
+                                os.kill(processid, 9)
+                            except Exception as e:
+                                logActivity(
+                                    f"[MEMORY SCANNER]: Falha ao dar kill no {processid}: {e}")
+                
+                                alerta = "Ransomware de PID " + str(processid) + " foi encontrado"
+                                windll.user32.MessageBoxA(0, alerta.encode(), b"ALERTA!!!", 0)
+                
+                        return
+                
+                
+                def main():
+                    rule, live, scan, kill = arguments()
+                
+                    rules = yara.compile(rule)
+                
+                    if scan:
+                        memory_scanner(scan, rules, kill)
+                
+                    if live:
+                        index = 0
+                        line = 0
+                
+                        while True:
+                            with open(drive + "\\Dehkiller\\WATCHER", "r") as getpids:
+                                allpids = getpids.readlines()
+                
+                            try:
+                                regex = re.findall(r"(([0-9]*),)", allpids[line])
+                                pids = [int(processid[1]) for processid in regex]
+                            except:
+                                continue
+                
+                            try:
+                                pid = pids[index]
+                                index += 1
+                                if index > 9:
+                                    index = 0
+                                    line += 1
+                                memory_scanner(pid, rules, kill)
+                
+                            except:
+                                continue
+                
+                
+                def killSubprocess(process):    # Matando o WATCHER.PY e seu arquivo WATCHER
+                    try:
+                        logActivity("[MEMORY SCANNER]: Matando o Watcher WMI")
+                        process.kill()
+                        time.sleep(1)
+                        logActivity("[MEMORY SCANNER]: Excluindo o arquivo WATCHER")
+                        os.remove("WATCHER")
+                        time.sleep(1)
+                    except Exception as e:
+                        print(
+                            f"[MEMORY SCANNER]: Erro na eliminação dos traços do WATCHER WMI: {e}")
+                    return
+                
+                
+                if __name__ == "__main__":
+                    with open("memorylog", "w") as create_clean_logs:
+                        create_clean_logs.close()
+                
+                    try:
+                        # Subindo o watcher.py através do comando python watcher.py. Depois de compilado, deve ser trocado
+                        watcher = subprocess.Popen(f"python {drive}\\Dehkiller\\watcher.pyw")
+                        # esse argumento para watcher.exe
+                        logActivity("[MEMORY SCANNER]: Subindo o WATCHER WMI")
+                    except Exception as e:
+                        logActivity(f"[MEMORY SCANNER]: Falha ao abrir o Watcher: {e}")
+                
+                    time.sleep(1)
+                    atexit.register(killSubprocess, process=watcher)
+                
+                    main()
+                
+            </pre></p>
+        </body>
+</html>
