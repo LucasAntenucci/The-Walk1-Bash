@@ -63,7 +63,7 @@ Erros Possiveis
 Teste Beta de "Dehrekkis" realizado em 30/09/2022.
 
         
-Qualquer dúvida chame um dos integrantes do grupo ou mande um e-mail para "thewalk1bash@mail.com".    
+Qualquer dúvida chame um dos integrantes do grupo ou mande um e-mail para "thewalk1bash@gmail.com".    
 
         
         
