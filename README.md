@@ -14,6 +14,7 @@ Instalação da Ferramenta (Sem o Wizard).
     Instale o Python 3.9
     Baixe a pasta "Dehkiller" em seu Disco Local C:\Program Files (x86).
     Abra seu prompt de comando em C:\Program Files (x86)\Dehkiller
+    Descompacte o "rules-master" dentro de C:\Program Files (x86)\Dehkiller
     Execute o comando 'pip install requirements.txt'
     Execute setup.exe como administrador
     Criação automática da pasta Dehkiller em seu Disco Local C:
