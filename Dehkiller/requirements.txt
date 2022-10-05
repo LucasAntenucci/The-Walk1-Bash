@@ -1,0 +1,4 @@
+pyfiglet
+wmi
+pywin32
+yara-python
